@@ -16,6 +16,13 @@ from math import atan2, sin, cos, pi
 from datetime import datetime
 import uiGobal as gv
 
+class stage(object):
+
+    def __init__(self, name, pos) -> None:
+        pass 
+        
+
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelImge(wx.Panel):
@@ -28,8 +35,22 @@ class PanelImge(wx.Panel):
         self.bmp = wx.Bitmap(gv.BGIMG_PATH, wx.BITMAP_TYPE_ANY)
 
 
+        self.stageParm = [
+            {'name': 'report', 'pos': (150, 150), 'link':(0,4), 'Act': True, 'bg': 'img/rpt_load_img_120.png'}, 
+            {'name': 'analysis', 'pos': (350, 150), 'link':(4,6), 'Act': False, 'bg': 'img/analys_120.png'},
+            {'name': 'ArtifDe', 'pos': (550, 150), 'link':(0,4), 'Act': True, 'bg': 'img/artifectDe.png'},
+            {'name': 'ArtifRe', 'pos': (750, 150), 'link':(0,6), 'Act': True, 'bg': 'img/artiFecRe.png'},
+
+            {'name': 'AptEvnt', 'pos': (350, 350), 'link':(0, 6), 'Act': True, 'bg': 'img/aptEvent.png'},
+            {'name': 'Mitre', 'pos': (550, 350), 'link':(1, 3), 'Act': True, 'bg': 'img/mitreTtps.png'},
+            {'name': 'Components', 'pos': (750, 350), 'link':(0, 6), 'Act': True, 'bg': 'img/components.png'},
+            
+            {'name': 'ProDec', 'pos': (350, 550), 'link':(0, 4), 'Act': False, 'bg': 'img/ProDec.png'},
+            {'name': 'ScreenPlay', 'pos': (550, 550), 'link':(0, 4), 'Act': True, 'bg': 'img/screenplay.png'},
+            {'name': 'Testbed', 'pos': (750, 550), 'link':(0, ), 'Act': False, 'bg': 'img/testBed.png'},
+        ]
+        self.btlist = {}
         self.buildStateBts()
-        
         self.Bind(wx.EVT_PAINT, self.onPaint)
         self.SetDoubleBuffered(True)
 
@@ -37,31 +58,60 @@ class PanelImge(wx.Panel):
         startPt = (150, 150)
         stateSz = (120, 120)
         dis = 200
-        self.button_pointer = wx.BitmapButton(self, -1, 
-                                    wx.Bitmap("img/rpt_load_img_120.png", wx.BITMAP_TYPE_ANY), 
-                                    pos=(startPt[0]- 60, startPt[1]-60), 
-                                    size=(120, 120))
-        self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+        self.btlist = {}
+        for stage in self.stageParm:
+            pt = stage['pos']
+            button = wx.BitmapButton(self, -1, 
+                                wx.Bitmap(stage['bg'], wx.BITMAP_TYPE_ANY), 
+                                pos=(pt[0] - 60, pt[1] -60),
+                                size=(120, 120))
+            if not stage['Act']:button.Disable()
+            if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
 
-        btlist = []
-        for i in range(3):
-            vPos = startPt[1] + dis*i
-            for j in range(3):
-                hPos = startPt[0] + 200*(1+j)
-                button = wx.BitmapButton(self, -1, 
-                                    wx.Bitmap("img/placeHoderImg.png", wx.BITMAP_TYPE_ANY), 
-                                    pos=(hPos- 60, vPos-60), 
-                                    size=(120, 120))
-                btlist.append(button)
+            self.btlist[stage['name']] = button
+            #btlist.append(button)
+        
+    
+        # self.button_pointer = wx.BitmapButton(self, -1, 
+        #                             wx.Bitmap("img/rpt_load_img_120.png", wx.BITMAP_TYPE_ANY), 
+        #                             pos=(self.centerPtList[0][0] -60, self.centerPtList[0][1] -60), 
+        #                             size=(120, 120))
+        # self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
 
+               # create wx.Bitmap object 
+        #bmp = wx.Bitmap('img/rpt_load_img_120.png')
+  
+        # create button at point (20, 20)
+        #self.button_pointer = wx.Button(self, id = 1, label ="Button", pos=(startPt[0]- 60, startPt[1]-60), 
+        #                                size=(120, 120),  name ="button")
+          
+        # set bmp as bitmap for button
+        #self.button_pointer.SetBitmap(bmp)
 
-
+        # btlist = []
+        # for pt in self.centerPtList:
+        #     if pt[0] == 150: continue
+        #     button = wx.BitmapButton(self, -1, 
+        #                         wx.Bitmap("img/placeHoderImg.png", wx.BITMAP_TYPE_ANY), 
+        #                         pos=(pt[0] - 60, pt[1] -60),
+        #                         size=(120, 120))
+        #     btlist.append(button)
 
 
     def mouseDown(self, event):
-        pic = wx.Bitmap("img/rpt_load_img_120G.png", wx.BITMAP_TYPE_ANY)
-        self.button_pointer.SetBitmap(pic)
-        self.button_pointer.Disable()
+        #pic = wx.Bitmap("img/rpt_load_img_120G.png", wx.BITMAP_TYPE_ANY)
+        #self.button_pointer.SetBitmap(pic)
+        #self.button_pointer.Disable()
+        openFileDialog = wx.FileDialog(self, "Open", gv.dirpath, "", 
+                "CTI report Files (*.pdf;*.doc;*.ppt)|*.pdf;*.PDF;*.doc", 
+            wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        openFileDialog.ShowModal()
+        path = str(openFileDialog.GetPath())
+        openFileDialog.Destroy()
+        #self.scValTC.SetValue(path)
+        self.srcType = 'file'
+
+        self.btlist['analysis'].Enable()
 
 
 #--PanelImge--------------------------------------------------------------------
@@ -72,10 +122,25 @@ class PanelImge(wx.Panel):
         #dc.DrawBitmap(self._scaleBitmap(self.bmp, w, h), 0, 0)
         dc.SetPen(wx.Pen('RED'))
         dc.DrawText('This is a sample image', w//2, h//2)
-        dc.SetBrush(wx.Brush(wx.Colour(200, 200, 200)))
+        dc.SetBrush(wx.Brush(wx.Colour(150, 150, 150)))
         dc.DrawRectangle(0, 0, 1000, 800)
 
-        self.DrawArrowLine(dc , 0, 0 , 50, 50)
+
+        for stage in self.stageParm:
+            pt = stage['pos']
+            print(stage['link'])
+            for i in stage['link']:
+                if i == 4:
+                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]+130, pt[1])
+
+                if i == 6:
+                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0], pt[1]+130)
+
+                if i == 1:
+                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]-130, pt[1]-130)
+
+                if i == 3:
+                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]+130, pt[1]-130)
 
 
 #--PanelImge--------------------------------------------------------------------
@@ -110,8 +175,6 @@ class PanelImge(wx.Panel):
         """
         self.Refresh(False)
         self.Update()
-
-
 
 
     def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=8 ):
