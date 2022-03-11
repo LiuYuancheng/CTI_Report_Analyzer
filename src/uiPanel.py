@@ -50,6 +50,8 @@ class PanelImge(wx.Panel):
             {'name': 'Testbed', 'pos': (750, 550), 'link':(0, ), 'Act': False, 'bg': 'img/testBed.png'},
         ]
         self.btlist = {}
+        self.pblist = {}
+        self.progress = [0]*10
         self.buildStateBts()
         self.Bind(wx.EVT_PAINT, self.onPaint)
         self.SetDoubleBuffered(True)
@@ -68,7 +70,12 @@ class PanelImge(wx.Panel):
             if not stage['Act']:button.Disable()
             if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
 
+            gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
+            gauge.SetValue(1)
+            gauge.Hide()
+
             self.btlist[stage['name']] = button
+            self.pblist[stage['name']] = gauge
             #btlist.append(button)
         
     
@@ -128,19 +135,25 @@ class PanelImge(wx.Panel):
 
         for stage in self.stageParm:
             pt = stage['pos']
-            print(stage['link'])
+            #print(stage['link'])
             for i in stage['link']:
                 if i == 4:
-                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]+130, pt[1])
+                    self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1])
 
                 if i == 6:
-                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0], pt[1]+130)
+                    self.DrawArrowLine(dc, pt[0], pt[1], pt[0], pt[1]+130)
 
                 if i == 1:
-                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]-130, pt[1]-130)
+                    self.DrawArrowLine(dc, pt[0], pt[1], pt[0]-130, pt[1]-130)
 
                 if i == 3:
-                    self.DrawArrowLine(dc , pt[0], pt[1] , pt[0]+130, pt[1]-130)
+                    self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1]-130)
+            
+            dc.SetPen(wx.Pen('Gray'))
+            dc.SetBrush(wx.Brush(wx.Colour(200, 210, 200)))
+            dc.DrawRectangle(pt[0] - 70, pt[1] - 70, 140, 140)
+
+
 
 
 #--PanelImge--------------------------------------------------------------------
