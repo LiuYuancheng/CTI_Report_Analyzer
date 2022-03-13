@@ -49,6 +49,19 @@ class PanelImge(wx.Panel):
             {'name': 'ScreenPlay', 'pos': (550, 550), 'link':(0, 4), 'Act': True, 'bg': 'img/screenplay.png'},
             {'name': 'Testbed', 'pos': (750, 550), 'link':(0, ), 'Act': False, 'bg': 'img/testBed.png'},
         ]
+        self.stageProgress = {
+            'report': 0,
+            'analysis': 0, 
+            'ArtifDe': 0,
+            'ArtifRe': 0,
+            'AptEvnt': 0, 
+            'Mitre': 0,
+            'Components': 0, 
+            'ProDec': 0, 
+            'ScreenPlay': 0, 
+            'Testbed':0,
+        }
+
         self.btlist = {}
         self.pblist = {}
         self.progress = [0]*10
@@ -72,7 +85,8 @@ class PanelImge(wx.Panel):
 
             gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
             gauge.SetValue(1)
-            gauge.Hide()
+            if self.stageProgress[stage['name']] == 0:
+                gauge.Hide()
 
             self.btlist[stage['name']] = button
             self.pblist[stage['name']] = gauge
@@ -118,7 +132,9 @@ class PanelImge(wx.Panel):
         #self.scValTC.SetValue(path)
         self.srcType = 'file'
 
-        self.btlist['analysis'].Enable()
+        self.stageProgress['report'] = 2
+
+        #self.btlist['analysis'].Enable()
 
 
 #--PanelImge--------------------------------------------------------------------
@@ -154,8 +170,6 @@ class PanelImge(wx.Panel):
             dc.DrawRectangle(pt[0] - 70, pt[1] - 70, 140, 140)
 
 
-
-
 #--PanelImge--------------------------------------------------------------------
     def _scaleBitmap(self, bitmap, width, height):
         """ Resize a input bitmap.(bitmap-> image -> resize image -> bitmap)"""
@@ -189,6 +203,18 @@ class PanelImge(wx.Panel):
         self.Refresh(False)
         self.Update()
 
+    def updateStage(self):
+        for key, value in self.stageProgress.items():
+            if value == 2:
+                self.pblist[key].Show()
+            if 0< value < 10: 
+                self.stageProgress[key] += 2
+                self.pblist[key].SetValue(self.stageProgress[key])
+            
+            if self.stageProgress['report'] == 10:
+                self.btlist['analysis'].Enable()
+
+            
 
     def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=8 ):
         '''

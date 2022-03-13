@@ -56,6 +56,7 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
+            gv.iImagePanel.updateStage()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
