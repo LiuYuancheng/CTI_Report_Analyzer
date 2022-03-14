@@ -10,6 +10,7 @@
 # License:     YC
 #-----------------------------------------------------------------------------
 import wx
+from wx.adv import Animation, AnimationCtrl
 from math import atan2, sin, cos, pi
 
 
@@ -82,6 +83,8 @@ class PanelImge(wx.Panel):
                                 size=(120, 120))
             if not stage['Act']:button.Disable()
             if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+            if stage['name'] == 'analysis': button.Bind(wx.EVT_LEFT_DOWN, self.onAnalyseSelection)
+
 
             gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
             gauge.SetValue(1)
@@ -136,6 +139,21 @@ class PanelImge(wx.Panel):
 
         #self.btlist['analysis'].Enable()
 
+    def onAnalyseSelection(self, event):
+        self.infoWindow = wx.MiniFrame(gv.iMainFrame, -1,
+            'Monitoring Camera View', pos=(300, 300), size=(300, 230),
+            style=wx.DEFAULT_FRAME_STYLE)
+        analysPnel = AnalysisSelection(self.infoWindow, 0)
+        self.infoWindow.Bind(wx.EVT_CLOSE, self.infoWinClose)
+        self.infoWindow.Show()
+        #analysPnel.setPlay(True)
+
+
+#--PanelMap--------------------------------------------------------------------
+    def infoWinClose(self, event):
+        """ Close/Destroy the pop-up detail information window."""
+        if self.infoWindow:
+            self.infoWindow.Destroy()
 
 #--PanelImge--------------------------------------------------------------------
     def onPaint(self, evt):
@@ -258,6 +276,56 @@ class PanelImge(wx.Panel):
 
 
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class AnalysisSelection(wx.Panel):
+    """ Panel play a gif image to simulation the camera view when train pass."""
+    def __init__(self, parent, idx, size=(280, 200), style=wx.TRANSPARENT_WINDOW):
+        """ Panel to simulate the camera view."""
+        wx.Panel.__init__(self, parent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.AddSpacer(5)
+        sizer.Add(wx.StaticText(
+            self, label="CTI report analysis configuration:"), flag=wx.LEFT, border=2)
+        self.attackCtrl = wx.ComboBox(
+            self, -1, choices=['file_name1.pdf', 'file_name2.pdf'], style=wx.CB_READONLY)
+        
+        self.attackCtrl.SetSelection(0)
+        sizer.AddSpacer(5)
+        sizer.Add(self.attackCtrl, flag=wx.LEFT, border=2)
+        sizer.AddSpacer(5)
+        sizer.Add(wx.StaticText(
+            self, label="CTI report analysis Algo:"), flag=wx.LEFT, border=2)
+        self.simuCb3 = wx.CheckBox(self, -1, 'Natural Language Processing (NLP)')
+        sizer.Add(self.simuCb3, flag=wx.LEFT, border=2)
+        sizer.AddSpacer(5)
+
+        self.simuCb4 = wx.CheckBox(self, -1, 'domain-specific graph alignment algorithm')
+        sizer.Add(self.simuCb4, flag=wx.LEFT, border=2)
+
+
+
+        self.animCtrl = AnimationCtrl(self, -1, Animation('img/search_100.gif'))
+        self.animCtrl.Stop() # stop the gif play first.
+        sizer.Add(self.animCtrl, flag=wx.LEFT, border=2)
+
+        self.button_pointer = wx.Button(self, id = 1, label ="Start",   name ="button")
+        sizer.Add(self.button_pointer, flag=wx.LEFT, border=2)
+        self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+        self.SetSizerAndFit(sizer)
+        self.Show()
+
+
+    def mouseDown(self, event):
+        self.setPlay(True)
+
+#--PanelCameraView-------------------------------------------------------------
+    def setPlay(self, plagFlag):
+        """ Set the gif play or stop"""
+        if plagFlag:
+            self.animCtrl.Play()
+        else:
+            self.animCtrl.Stop()
 
 
 
