@@ -6,9 +6,9 @@
 #              
 # Author:      Yuancheng Liu
 #
-# Created:     2020/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Created:     2022/03/14
+# Copyright:   2022 @ National Cybersecurity R&D Laboratories (https://ncl.sg/)
+# License:     
 #-----------------------------------------------------------------------------
 import os
 
@@ -32,4 +32,4 @@ gUpdateRate = 1     # main frame update rate 1 sec.
 iMainFrame = None   # MainFrame.
 iImagePanel = None  # Image panel.
 iCtrlPanel = None   # control panel
-
+iRptFnameList = ['CTI_test_file.pdf' ]  # CTI file name list

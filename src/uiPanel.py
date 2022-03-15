@@ -5,9 +5,9 @@
 # Purpose:     This module is used to create different function panels.
 # Author:      Yuancheng Liu
 #
-# Created:     2020/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Created:     2022/03/12
+# Copyright:   2022 @ National Cybersecurity R&D Laboratories (https://ncl.sg/)
+# License:     
 #-----------------------------------------------------------------------------
 import wx
 from wx.adv import Animation, AnimationCtrl
@@ -34,7 +34,7 @@ class PanelImge(wx.Panel):
         self.SetBackgroundColour(wx.Colour(200, 200, 200))
         self.panelSize = panelSize
         self.bmp = wx.Bitmap(gv.BGIMG_PATH, wx.BITMAP_TYPE_ANY)
-
+        self.fileState = 0
 
         self.stageParm = [
             {'name': 'report', 'pos': (150, 150), 'link':(0,4), 'Act': True, 'bg': 'img/rpt_load_img_120.png'}, 
@@ -82,7 +82,7 @@ class PanelImge(wx.Panel):
                                 pos=(pt[0] - 60, pt[1] -60),
                                 size=(120, 120))
             if not stage['Act']:button.Disable()
-            if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+            if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.onFileSelect)
             if stage['name'] == 'analysis': button.Bind(wx.EVT_LEFT_DOWN, self.onAnalyseSelection)
 
 
@@ -122,28 +122,25 @@ class PanelImge(wx.Panel):
         #     btlist.append(button)
 
 
-    def mouseDown(self, event):
-        #pic = wx.Bitmap("img/rpt_load_img_120G.png", wx.BITMAP_TYPE_ANY)
-        #self.button_pointer.SetBitmap(pic)
-        #self.button_pointer.Disable()
+    def onFileSelect(self, event):
         openFileDialog = wx.FileDialog(self, "Open", gv.dirpath, "", 
                 "CTI report Files (*.pdf;*.doc;*.ppt)|*.pdf;*.PDF;*.doc", 
             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         openFileDialog.ShowModal()
         path = str(openFileDialog.GetPath())
-        openFileDialog.Destroy()
-        #self.scValTC.SetValue(path)
-        self.srcType = 'file'
+        name = str(openFileDialog.GetName())
+        print('file name: %s' %str(name))
+        gv.iRptFnameList.append(path)
 
+        openFileDialog.Destroy()
         self.stageProgress['report'] = 2
 
-        #self.btlist['analysis'].Enable()
 
     def onAnalyseSelection(self, event):
         self.infoWindow = wx.MiniFrame(gv.iMainFrame, -1,
-            'Monitoring Camera View', pos=(300, 300), size=(300, 230),
+            'Monitoring Camera View', pos=(300, 300), size=(600, 430),
             style=wx.DEFAULT_FRAME_STYLE)
-        analysPnel = AnalysisSelection(self.infoWindow, 0)
+        analysPnel = CTIAnalysisConfiPnl(self.infoWindow, 0)
         self.infoWindow.Bind(wx.EVT_CLOSE, self.infoWinClose)
         self.infoWindow.Show()
         #analysPnel.setPlay(True)
@@ -163,7 +160,7 @@ class PanelImge(wx.Panel):
         #dc.DrawBitmap(self._scaleBitmap(self.bmp, w, h), 0, 0)
         dc.SetPen(wx.Pen('RED'))
         dc.DrawText('This is a sample image', w//2, h//2)
-        dc.SetBrush(wx.Brush(wx.Colour(150, 150, 150)))
+        dc.SetBrush(wx.Brush(wx.Colour(60, 60, 60)))
         dc.DrawRectangle(0, 0, 1000, 800)
 
 
@@ -172,7 +169,10 @@ class PanelImge(wx.Panel):
             #print(stage['link'])
             for i in stage['link']:
                 if i == 4:
-                    self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1])
+                    if stage['name']== 'report' and self.fileState == 2:
+                        self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1], color=wx.Colour('Green'))
+                    else:
+                        self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1])
 
                 if i == 6:
                     self.DrawArrowLine(dc, pt[0], pt[1], pt[0], pt[1]+130)
@@ -187,6 +187,23 @@ class PanelImge(wx.Panel):
             dc.SetBrush(wx.Brush(wx.Colour(200, 210, 200)))
             dc.DrawRectangle(pt[0] - 70, pt[1] - 70, 140, 140)
 
+        if self.fileState == 1:
+            dc.SetPen(wx.Pen('Green'))
+            dc.SetTextForeground(wx.Colour('Green'))
+            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            #pos = self.stageParm['report']['pos']
+            dc.DrawText('Verifying CTI file', 80, 60)
+        elif self.fileState == 2:
+            dc.SetPen(wx.Pen('White'))
+            dc.SetTextForeground(wx.Colour('Blue'))
+            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            #pos = self.stageParm['report']['pos']
+            dc.DrawText('CTI report file ready', 80, 60)
+        else:
+            dc.SetTextForeground(wx.Colour('White'))
+            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            #pos = self.stageParm['report']['pos']
+            dc.DrawText('Click this button to load CTI report file', 80, 60)
 
 #--PanelImge--------------------------------------------------------------------
     def _scaleBitmap(self, bitmap, width, height):
@@ -225,16 +242,20 @@ class PanelImge(wx.Panel):
         for key, value in self.stageProgress.items():
             if value == 2:
                 self.pblist[key].Show()
+                self.fileState = 1
+                self.updateDisplay()
             if 0< value < 10: 
                 self.stageProgress[key] += 2
                 self.pblist[key].SetValue(self.stageProgress[key])
             
             if self.stageProgress['report'] == 10:
                 self.btlist['analysis'].Enable()
+                self.fileState = 2
+                self.updateDisplay()
 
             
 
-    def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=8 ):
+    def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=8, color= wx.Colour(0, 0, 0)):
         '''
             Draws a line with arrows in a regular wxPython DC.
             The line is drawn with the dc's wx.Pen.  The arrows are filled with the current Pen's colour.
@@ -244,8 +265,8 @@ class PanelImge(wx.Panel):
         # Set up the dc for drawing the arrows.
         penSave, brushSave = dc.GetPen(), dc.GetBrush()
         #dc.SetPen( wx.TRANSPARENT_PEN )
-        dc.SetPen(wx.Pen(wx.Colour(0, 0, 0), 2))
-        dc.SetBrush( wx.Brush(wx.Colour(0, 0, 0)))
+        dc.SetPen(wx.Pen(color, 2))
+        dc.SetBrush( wx.Brush(color))
 
         dc.DrawLine( x0, y0, x1, y1 )
         if x0 == x1 and y0 == y1:
@@ -278,17 +299,41 @@ class PanelImge(wx.Panel):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class AnalysisSelection(wx.Panel):
-    """ Panel play a gif image to simulation the camera view when train pass."""
+class CTIAnalysisConfiPnl(wx.Panel):
+    """ CTI report analysis config setting panel"""
     def __init__(self, parent, idx, size=(280, 200), style=wx.TRANSPARENT_WINDOW):
         """ Panel to simulate the camera view."""
         wx.Panel.__init__(self, parent)
+        # try:
+
+        #     image_file = 'img/analysis/analysisBg.jpg'
+        #     bmp1 = wx.Image(
+        #     image_file, 
+        #         wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        #     # image's upper left corner anchors at panel 
+        #     # coordinates (0, 0)
+        #     self.bitmap1 = wx.StaticBitmap(
+        #         self, -1, bmp1, (0, 0))
+        #     # show some image details
+        #     str1 = "%s  %dx%d" % (image_file, bmp1.GetWidth(),
+        #                         bmp1.GetHeight()) 
+        #     parent.SetTitle(str1)
+        # except IOError:
+        #     print ("Image file %s not found" % image_file)
+        #     raise SystemExit
+
         sizer = wx.BoxSizer(wx.VERTICAL)
+
+        image_file = 'img/analysis/analysisBg3.jpg'
+        bmp1 = wx.Image( image_file, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.bitmap1 = wx.StaticBitmap(self, -1, bmp1, (0, 0))
+        sizer.Add(self.bitmap1, flag=wx.LEFT, border=2)
+
         sizer.AddSpacer(5)
         sizer.Add(wx.StaticText(
             self, label="CTI report analysis configuration:"), flag=wx.LEFT, border=2)
         self.attackCtrl = wx.ComboBox(
-            self, -1, choices=['file_name1.pdf', 'file_name2.pdf'], style=wx.CB_READONLY)
+            self, -1, choices=gv.iRptFnameList, style=wx.CB_READONLY, size=(400, 25))
         
         self.attackCtrl.SetSelection(0)
         sizer.AddSpacer(5)
@@ -302,6 +347,7 @@ class AnalysisSelection(wx.Panel):
 
         self.simuCb4 = wx.CheckBox(self, -1, 'domain-specific graph alignment algorithm')
         sizer.Add(self.simuCb4, flag=wx.LEFT, border=2)
+        sizer.AddSpacer(5)
 
 
 
@@ -312,9 +358,27 @@ class AnalysisSelection(wx.Panel):
         self.button_pointer = wx.Button(self, id = 1, label ="Start",   name ="button")
         sizer.Add(self.button_pointer, flag=wx.LEFT, border=2)
         self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+
         self.SetSizerAndFit(sizer)
         self.Show()
 
+        #self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
+
+
+    def OnEraseBackground(self, evt):
+        """
+        Add a picture to the background
+        """
+        # yanked from ColourDB.py
+        dc = evt.GetDC()
+                
+        if not dc:
+            dc = wx.ClientDC(self)
+            rect = self.GetUpdateRegion().GetBox()
+            dc.SetClippingRect(rect)
+        dc.Clear()
+        bmp = wx.Bitmap('img/analysis/analysisBg.jpg')
+        dc.DrawBitmap(bmp, 0, 0)
 
     def mouseDown(self, event):
         self.setPlay(True)
