@@ -84,7 +84,7 @@ class PanelImge(wx.Panel):
             if not stage['Act']:button.Disable()
             if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.onFileSelect)
             if stage['name'] == 'analysis': button.Bind(wx.EVT_LEFT_DOWN, self.onAnalyseSelection)
-
+            if stage['name'] == 'AptEvnt': button.Bind(wx.EVT_LEFT_DOWN, self.aptEventSelection)
 
             gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
             gauge.SetValue(1)
@@ -138,13 +138,20 @@ class PanelImge(wx.Panel):
 
     def onAnalyseSelection(self, event):
         self.infoWindow = wx.MiniFrame(gv.iMainFrame, -1,
-            'Monitoring Camera View', pos=(300, 300), size=(600, 430),
+            'CTI report analysis config', pos=(300, 300), size=(480, 600),
             style=wx.DEFAULT_FRAME_STYLE)
         analysPnel = CTIAnalysisConfiPnl(self.infoWindow, 0)
         self.infoWindow.Bind(wx.EVT_CLOSE, self.infoWinClose)
         self.infoWindow.Show()
         #analysPnel.setPlay(True)
 
+    def aptEventSelection(self,event):
+        self.infoWindow = wx.MiniFrame(gv.iMainFrame, -1,
+            'APT event dashboard', pos=(300, 300), size=(1060, 470),
+            style=wx.DEFAULT_FRAME_STYLE)
+        analysPnel = CTIAnalysisConfiPnl2(self.infoWindow, 0)
+        self.infoWindow.Bind(wx.EVT_CLOSE, self.infoWinClose)
+        self.infoWindow.Show()
 
 #--PanelMap--------------------------------------------------------------------
     def infoWinClose(self, event):
@@ -190,18 +197,18 @@ class PanelImge(wx.Panel):
         if self.fileState == 1:
             dc.SetPen(wx.Pen('Green'))
             dc.SetTextForeground(wx.Colour('Green'))
-            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
             #pos = self.stageParm['report']['pos']
-            dc.DrawText('Verifying CTI file', 80, 60)
+            dc.DrawText('Verifying CTI file ...', 80, 60)
         elif self.fileState == 2:
             dc.SetPen(wx.Pen('White'))
-            dc.SetTextForeground(wx.Colour('Blue'))
-            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            dc.SetTextForeground(wx.Colour('White'))
+            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
             #pos = self.stageParm['report']['pos']
-            dc.DrawText('CTI report file ready', 80, 60)
+            dc.DrawText('CTI report file ready.', 80, 60)
         else:
             dc.SetTextForeground(wx.Colour('White'))
-            dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
             #pos = self.stageParm['report']['pos']
             dc.DrawText('Click this button to load CTI report file', 80, 60)
 
@@ -295,6 +302,17 @@ class PanelImge(wx.Panel):
         dc.SetPen( penSave )
         dc.SetBrush( brushSave )
 
+class CTIAnalysisConfiPnl2(wx.Panel):
+    def __init__(self, parent, idx, size=(280, 200), style=wx.TRANSPARENT_WINDOW):
+        """ Panel to simulate the camera view."""
+        wx.Panel.__init__(self, parent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        flagL = wx.LEFT
+        self.bitmap1 = wx.StaticBitmap(
+            self, -1, wx.Image("img/event.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap())
+        sizer.Add(self.bitmap1, flag=flagL, border=2)
+        self.SetSizerAndFit(sizer)
+        self.Show()
 
 
 #-----------------------------------------------------------------------------
@@ -304,97 +322,87 @@ class CTIAnalysisConfiPnl(wx.Panel):
     def __init__(self, parent, idx, size=(280, 200), style=wx.TRANSPARENT_WINDOW):
         """ Panel to simulate the camera view."""
         wx.Panel.__init__(self, parent)
-        # try:
+        self.SetSizerAndFit(self._buildUISizer())
+        self.Show()
 
-        #     image_file = 'img/analysis/analysisBg.jpg'
-        #     bmp1 = wx.Image(
-        #     image_file, 
-        #         wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        #     # image's upper left corner anchors at panel 
-        #     # coordinates (0, 0)
-        #     self.bitmap1 = wx.StaticBitmap(
-        #         self, -1, bmp1, (0, 0))
-        #     # show some image details
-        #     str1 = "%s  %dx%d" % (image_file, bmp1.GetWidth(),
-        #                         bmp1.GetHeight()) 
-        #     parent.SetTitle(str1)
-        # except IOError:
-        #     print ("Image file %s not found" % image_file)
-        #     raise SystemExit
-
+    def _buildUISizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
-
-        image_file = 'img/analysis/analysisBg3.jpg'
-        bmp1 = wx.Image( image_file, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.bitmap1 = wx.StaticBitmap(self, -1, bmp1, (0, 0))
-        sizer.Add(self.bitmap1, flag=wx.LEFT, border=2)
-
+        flagL = wx.LEFT
+        self.bitmap1 = wx.StaticBitmap(
+            self, -1, wx.Image(gv.ANA_TITLE_PATH, wx.BITMAP_TYPE_ANY).ConvertToBitmap())
+        sizer.Add(self.bitmap1, flag=flagL, border=2)
         sizer.AddSpacer(5)
+
         sizer.Add(wx.StaticText(
-            self, label="CTI report analysis configuration:"), flag=wx.LEFT, border=2)
-        self.attackCtrl = wx.ComboBox(
+            self, label="CTI Report Analysis Configuration"), flag=flagL, border=2)
+        sizer.AddSpacer(10)
+
+        sizer.Add(wx.StaticText(
+            self, label="CTI Report File Selection: "), flag=flagL, border=2)
+        sizer.AddSpacer(2)
+        self.fileSelectCB = wx.ComboBox(
             self, -1, choices=gv.iRptFnameList, style=wx.CB_READONLY, size=(400, 25))
-        
-        self.attackCtrl.SetSelection(0)
-        sizer.AddSpacer(5)
-        sizer.Add(self.attackCtrl, flag=wx.LEFT, border=2)
-        sizer.AddSpacer(5)
+        self.fileSelectCB.SetSelection(0)
+        sizer.Add(self.fileSelectCB, flag=flagL, border=2)
+        sizer.AddSpacer(10)
+
         sizer.Add(wx.StaticText(
-            self, label="CTI report analysis Algo:"), flag=wx.LEFT, border=2)
-        self.simuCb3 = wx.CheckBox(self, -1, 'Natural Language Processing (NLP)')
-        sizer.Add(self.simuCb3, flag=wx.LEFT, border=2)
-        sizer.AddSpacer(5)
+            self, label="CTI Report Analysis Algo:"), flag=flagL, border=2)
+        sizer.AddSpacer(2)
+        self.algoCB1 = wx.CheckBox(self, -1, 'Natural Language Processing (NLP)')
+        sizer.Add(self.algoCB1, flag=flagL, border=2)
+        self.algoCB1.SetValue(True)
+        sizer.AddSpacer(2)
+        self.algoCB2 = wx.CheckBox(self, -1, 'Domain-specific graph alignment algorithm')
+        sizer.Add(self.algoCB2, flag=flagL, border=2)
+        self.algoCB2.SetValue(True)
+        sizer.AddSpacer(2)
+        self.algoCB3 = wx.CheckBox(self, -1, '[ Placeholder for other algorithm ] ')
+        sizer.Add(self.algoCB3, flag=flagL, border=2)
+        sizer.AddSpacer(10)
 
-        self.simuCb4 = wx.CheckBox(self, -1, 'domain-specific graph alignment algorithm')
-        sizer.Add(self.simuCb4, flag=wx.LEFT, border=2)
-        sizer.AddSpacer(5)
+        sizer.Add(wx.StaticText(
+            self, label="CTI Report Analysis Output result:"), flag=flagL, border=2)
+        sizer.AddSpacer(2)
+        self.rstCB1 = wx.CheckBox(self, -1, 'Artifact Description')
+        self.rstCB1.SetValue(True)
+        sizer.Add(self.rstCB1, flag=flagL, border=2)
+        sizer.AddSpacer(2)
+        self.rstCB2 = wx.CheckBox(self, -1, 'APT Event')
+        self.rstCB2.SetValue(True)
+        sizer.Add(self.rstCB2, flag=flagL, border=2)
+        sizer.AddSpacer(10)
 
-
-
-        self.animCtrl = AnimationCtrl(self, -1, Animation('img/search_100.gif'))
+        self.animCtrl = AnimationCtrl(self, -1, Animation(gv.ANA_PROCE_PATH))
         self.animCtrl.Stop() # stop the gif play first.
         sizer.Add(self.animCtrl, flag=wx.LEFT, border=2)
-
         self.button_pointer = wx.Button(self, id = 1, label ="Start",   name ="button")
         sizer.Add(self.button_pointer, flag=wx.LEFT, border=2)
         self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
 
-        self.SetSizerAndFit(sizer)
-        self.Show()
+        sizer.Add(wx.StaticText(
+            self, label="Progress Log:"), flag=flagL, border=2)
+        sizer.AddSpacer(10)
+        self.detailTC = wx.TextCtrl(
+            self, size=(500, 300), style=wx.TE_MULTILINE)
+        sizer.Add(self.detailTC, flag=flagL, border=2)
+    
+        return sizer
 
-        #self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
-
-
-    def OnEraseBackground(self, evt):
-        """
-        Add a picture to the background
-        """
-        # yanked from ColourDB.py
-        dc = evt.GetDC()
-                
-        if not dc:
-            dc = wx.ClientDC(self)
-            rect = self.GetUpdateRegion().GetBox()
-            dc.SetClippingRect(rect)
-        dc.Clear()
-        bmp = wx.Bitmap('img/analysis/analysisBg.jpg')
-        dc.DrawBitmap(bmp, 0, 0)
-
+#-----------------------------------------------------------------------------
     def mouseDown(self, event):
         self.setPlay(True)
+        self.detailTC.AppendText("Starting analysis the report .... \n")
+        self.detailTC.AppendText("Parsing the report .... \n")
+        self.detailTC.AppendText("Pass the report in algo module: \n [Natural Language Processing (NLP)].... \n")
 
-#--PanelCameraView-------------------------------------------------------------
+#-----------------------------------------------------------------------------
     def setPlay(self, plagFlag):
         """ Set the gif play or stop"""
         if plagFlag:
             self.animCtrl.Play()
         else:
             self.animCtrl.Stop()
-
-
-
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

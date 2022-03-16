@@ -22,6 +22,10 @@ IMG_FD = 'img'
 ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
+ANA_TITLE_PATH = os.path.join(dirpath, IMG_FD, 'analysis', 'analysisBg3.jpg')
+ANA_PROCE_PATH = os.path.join(dirpath, IMG_FD, 'analysis', 'search_100.gif')
+
+
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gTranspPct = 100     # Windows transparent percentage.

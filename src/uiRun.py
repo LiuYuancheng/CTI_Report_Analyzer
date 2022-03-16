@@ -2,13 +2,13 @@
 #-----------------------------------------------------------------------------
 # Name:        uiRun.py
 #
-# Purpose:     This module is used as a sample to create the main wx frame.
+# Purpose:     This module used for the CTI reprot simulator UI main frame window.
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Created:     2022/03/14
+# Copyright:   2022 @ National Cybersecurity R&D Laboratories (https://ncl.sg/)
+# License:     
 #-----------------------------------------------------------------------------
 import os
 import sys
@@ -24,7 +24,7 @@ class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
-        wx.Frame.__init__(self, parent, id, title, size=(1200, 800))
+        wx.Frame.__init__(self, parent, id, title, size=(1050, 750))
         # No boader frame:
         #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
