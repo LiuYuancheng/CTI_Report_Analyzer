@@ -15,7 +15,7 @@ from math import atan2, sin, cos, pi
 
 
 from datetime import datetime
-import uiGobal as gv
+import CASimulatorGlobal as gv
 
 class stage(object):
 

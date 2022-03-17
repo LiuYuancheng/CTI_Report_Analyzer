@@ -16,6 +16,7 @@ print("Current working directory is : %s" % os.getcwd())
 dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
 APP_NAME = 'CTI_Report_Analyzer_SimulaterUI [Ver:0.1]'
+APP_WIN_SIZE = (1050, 750)
 
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = 'img'

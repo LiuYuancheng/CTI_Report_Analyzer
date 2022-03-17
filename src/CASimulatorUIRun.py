@@ -1,10 +1,12 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        uiRun.py
+# Name:        CASimulatorUIRun.py
 #
-# Purpose:     This module used for the CTI reprot simulator UI main frame window.
+# Purpose:     This module used for the CTI-Report Analyser System Simulator UI 
+#              main frame window.
 #
 # Author:      Yuancheng Liu
+# version:     v_0.1
 #
 # Created:     2022/03/14
 # Copyright:   2022 @ National Cybersecurity R&D Laboratories (https://ncl.sg/)
@@ -14,8 +16,8 @@ import os
 import sys
 import time
 import wx
-import uiGobal as gv
-import uiPanel as pl
+import CASimulatorGlobal as gv
+import CASimulatorPanel as pl
 PERIODIC = 500      # update in every 500ms
 
 #-----------------------------------------------------------------------------
@@ -24,9 +26,9 @@ class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
-        wx.Frame.__init__(self, parent, id, title, size=(1050, 750))
+        wx.Frame.__init__(self, parent, id, title, size=gv.APP_WIN_SIZE)
         # No boader frame:
-        #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
+        # wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
