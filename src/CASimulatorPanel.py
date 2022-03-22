@@ -38,7 +38,7 @@ class PanelImge(wx.Panel):
 
         self.stageParm = [
             {'name': 'report', 'pos': (150, 150), 'link':(0,4), 'Act': True, 'bg': 'img/rpt_load_img_120.png'}, 
-            {'name': 'analysis', 'pos': (350, 150), 'link':(4,6), 'Act': False, 'bg': 'img/analys_120.png'},
+            {'name': 'analysis', 'pos': (350, 150), 'link':(4,6), 'Act': False, 'bg': 'img/analysis_img_120.png'},
             {'name': 'ArtifDe', 'pos': (550, 150), 'link':(0,4), 'Act': True, 'bg': 'img/artifectDe.png'},
             {'name': 'ArtifRe', 'pos': (750, 150), 'link':(0,6), 'Act': True, 'bg': 'img/artiFecRe.png'},
 
@@ -75,52 +75,28 @@ class PanelImge(wx.Panel):
         stateSz = (120, 120)
         dis = 200
         self.btlist = {}
-        for stage in self.stageParm:
-            pt = stage['pos']
+        for stage in gv.idataMgr.getStagesList():
+
+            pt = stage.pos
             button = wx.BitmapButton(self, -1, 
-                                wx.Bitmap(stage['bg'], wx.BITMAP_TYPE_ANY), 
+                                wx.Bitmap(stage.bgImg, wx.BITMAP_TYPE_ANY), 
                                 pos=(pt[0] - 60, pt[1] -60),
                                 size=(120, 120))
-            if not stage['Act']:button.Disable()
-            if stage['name'] == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.onFileSelect)
-            if stage['name'] == 'analysis': button.Bind(wx.EVT_LEFT_DOWN, self.onAnalyseSelection)
-            if stage['name'] == 'AptEvnt': button.Bind(wx.EVT_LEFT_DOWN, self.aptEventSelection)
+            
+            if not stage.activeFg: button.Disable()
+            if stage.name == 'report': button.Bind(wx.EVT_LEFT_DOWN, self.onFileSelect)
+            if stage.name == 'analysis': button.Bind(wx.EVT_LEFT_DOWN, self.onAnalyseSelection)
+            if stage.name == 'aptEvnts': button.Bind(wx.EVT_LEFT_DOWN, self.aptEventSelection)
 
             gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
             gauge.SetValue(1)
-            if self.stageProgress[stage['name']] == 0:
+            if stage.stageProgress == 0:
                 gauge.Hide()
 
-            self.btlist[stage['name']] = button
-            self.pblist[stage['name']] = gauge
+            self.btlist[stage.name] = button
+            self.pblist[stage.name] = gauge
             #btlist.append(button)
         
-    
-        # self.button_pointer = wx.BitmapButton(self, -1, 
-        #                             wx.Bitmap("img/rpt_load_img_120.png", wx.BITMAP_TYPE_ANY), 
-        #                             pos=(self.centerPtList[0][0] -60, self.centerPtList[0][1] -60), 
-        #                             size=(120, 120))
-        # self.button_pointer.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
-
-               # create wx.Bitmap object 
-        #bmp = wx.Bitmap('img/rpt_load_img_120.png')
-  
-        # create button at point (20, 20)
-        #self.button_pointer = wx.Button(self, id = 1, label ="Button", pos=(startPt[0]- 60, startPt[1]-60), 
-        #                                size=(120, 120),  name ="button")
-          
-        # set bmp as bitmap for button
-        #self.button_pointer.SetBitmap(bmp)
-
-        # btlist = []
-        # for pt in self.centerPtList:
-        #     if pt[0] == 150: continue
-        #     button = wx.BitmapButton(self, -1, 
-        #                         wx.Bitmap("img/placeHoderImg.png", wx.BITMAP_TYPE_ANY), 
-        #                         pos=(pt[0] - 60, pt[1] -60),
-        #                         size=(120, 120))
-        #     btlist.append(button)
-
 
     def onFileSelect(self, event):
         openFileDialog = wx.FileDialog(self, "Open", gv.dirpath, "", 
@@ -133,7 +109,8 @@ class PanelImge(wx.Panel):
         gv.iRptFnameList.append(path)
 
         openFileDialog.Destroy()
-        self.stageProgress['report'] = 2
+        #self.stageProgress['report'] = 2
+        gv.idataMgr.report.stageProgress = 2
 
 
     def onAnalyseSelection(self, event):
@@ -171,12 +148,11 @@ class PanelImge(wx.Panel):
         dc.DrawRectangle(0, 0, 1000, 800)
 
 
-        for stage in self.stageParm:
-            pt = stage['pos']
-            #print(stage['link'])
-            for i in stage['link']:
+        for stage in gv.idataMgr.getStagesList() :
+            pt = stage.pos
+            for i in stage.link:
                 if i == 4:
-                    if stage['name']== 'report' and self.fileState == 2:
+                    if stage.name == 'report' and self.fileState == 2:
                         self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1], color=wx.Colour('Green'))
                     else:
                         self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1])

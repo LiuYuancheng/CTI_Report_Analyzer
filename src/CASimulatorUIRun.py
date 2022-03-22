@@ -16,6 +16,7 @@ import os
 import sys
 import time
 import wx
+import DataMgr as mgr
 import CASimulatorGlobal as gv
 import CASimulatorPanel as pl
 PERIODIC = 500      # update in every 500ms
@@ -64,6 +65,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
 class MyApp(wx.App):
     def OnInit(self):
+        gv.idataMgr = mgr.DataMgr()
         gv.iMainFrame = UIFrame(None, -1, gv.APP_NAME)
         gv.iMainFrame.Show(True)
         return True

@@ -12,18 +12,14 @@
 # Copyright:   n.a
 # License:     n.a
 #-----------------------------------------------------------------------------
-import imghdr
 import os 
 import time
 from fnmatch import fnmatch
 import threading
 
-import pkgGlobal as gv
-import PacketParser as pp
-import ProtocolChecker as pc
+import CASimulatorGlobal as gv
 
 LOOP_T = 0.5 # Thread loop time interval
-
 
 class Stage(object):
     def __init__(self, name, pos, link, bgImg) -> None:
@@ -34,16 +30,59 @@ class Stage(object):
         self.activeFg = False
         self.stageProgress = 0
 
-    
+    def actStage(self, actFlag):
+        self.activeFg = actFlag
+        self.stageProgress  = 1 if self.activeFg else 0
 
-
-
-
-
+    def updateStage(self, pct=2):
+        self.stageProgress = min(self.stageProgress+pct, 10)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class DataMgr(object):
+    """ Manager object used to process and store the data.""" 
+    def __init__(self) -> None:
+        super().__init__()
+
+        parm = gv.gStageDict['report']
+        self.report = Stage('report', parm['pos'], parm['link'], parm['bg'])
+        self.report.actStage(True)
+
+        parm = gv.gStageDict['analysis']
+        self.analysis = Stage('analysis', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['artifactDe']
+        self.artifactDe = Stage('AartifactDe', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['artifactRe']
+        self.artifactRe = Stage('artifactRe', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['aptEvnts']
+        self.aptEvnts = Stage('aptEvnts.', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['mitreTTPs']
+        self.mitreTTPs = Stage('mitreTTPs', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['components']
+        self.components = Stage('components', parm['pos'], parm['link'], parm['bg'])
+        
+        parm = gv.gStageDict['proDec']
+        self.proDec = Stage('proDec', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['screenPlay']
+        self.screenPlay = Stage('screenPlay', parm['pos'], parm['link'], parm['bg'])
+
+        parm = gv.gStageDict['testBed']
+        self.testBed = Stage('testBed', parm['pos'], parm['link'], parm['bg'])
+        
+    def getStagesList(self):
+        return [self.report ,self.analysis, self.artifactDe, self.artifactRe,  
+                self.aptEvnts, self.mitreTTPs, self.components,
+                self.proDec, self.screenPlay, self.testBed ]
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class DataMgr2(object):
     """ Manager object used to process and store the data.""" 
     def __init__(self) -> None:
         super().__init__()
