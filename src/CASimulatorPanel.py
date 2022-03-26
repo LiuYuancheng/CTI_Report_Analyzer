@@ -90,7 +90,7 @@ class PanelImge(wx.Panel):
 
             gauge = wx.Gauge(self, range = 10, pos=(pt[0] - 70, pt[1] + 62), size = (140, 10), style = wx.GA_HORIZONTAL)
             gauge.SetValue(1)
-            if stage.stageProgress == 0:
+            if stage.stageProgress <= 1 :
                 gauge.Hide()
 
             self.btlist[stage.name] = button
@@ -121,8 +121,11 @@ class PanelImge(wx.Panel):
         self.infoWindow.Bind(wx.EVT_CLOSE, self.infoWinClose)
         self.infoWindow.Show()
         #analysPnel.setPlay(True)
+        self.btlist['aptEvnts'].Enable()
+
 
     def aptEventSelection(self,event):
+        print("xxxxxxxxxx")
         self.infoWindow = wx.MiniFrame(gv.iMainFrame, -1,
             'APT event dashboard', pos=(300, 300), size=(1060, 470),
             style=wx.DEFAULT_FRAME_STYLE)
@@ -222,16 +225,21 @@ class PanelImge(wx.Panel):
         self.Update()
 
     def updateStage(self):
-        for key, value in self.stageProgress.items():
-            if value == 2:
-                self.pblist[key].Show()
-                self.fileState = 1
+        items = gv.idataMgr.getStagesList()
+        for stage in items:
+            value = stage.stageProgress
+            if value == 1:
+                self.pblist[stage.name].Show()
                 self.updateDisplay()
-            if 0< value < 10: 
-                self.stageProgress[key] += 2
-                self.pblist[key].SetValue(self.stageProgress[key])
             
-            if self.stageProgress['report'] == 10:
+            if 1 < value < 10: 
+                #self.stageProgress[key] += 2
+                #self.pblist[key].SetValue(self.stageProgress[key])
+                stage.updateStage()
+                self.fileState = 1
+                self.pblist[stage.name].SetValue(stage.stageProgress)
+            
+            if gv.idataMgr.report.stageProgress == 10:
                 self.btlist['analysis'].Enable()
                 self.fileState = 2
                 self.updateDisplay()

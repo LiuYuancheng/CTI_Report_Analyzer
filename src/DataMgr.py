@@ -58,7 +58,9 @@ class DataMgr(object):
         self.artifactRe = Stage('artifactRe', parm['pos'], parm['link'], parm['bg'])
 
         parm = gv.gStageDict['aptEvnts']
-        self.aptEvnts = Stage('aptEvnts.', parm['pos'], parm['link'], parm['bg'])
+        self.aptEvnts = Stage('aptEvnts', parm['pos'], parm['link'], parm['bg'])
+        self.aptEvnts.actStage(False)
+
 
         parm = gv.gStageDict['mitreTTPs']
         self.mitreTTPs = Stage('mitreTTPs', parm['pos'], parm['link'], parm['bg'])
