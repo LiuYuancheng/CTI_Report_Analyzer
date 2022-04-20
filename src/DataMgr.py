@@ -7,7 +7,7 @@
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2022/01/16
+# Created:     2022/04/16
 # Version:     v_0.1
 # Copyright:   n.a
 # License:     n.a
@@ -44,6 +44,7 @@ class DataMgr(object):
     def __init__(self) -> None:
         super().__init__()
 
+        self.rtn_addiontal = False
         parm = gv.gStageDict['report']
         self.report = Stage('report', parm['pos'], parm['link'], parm['bg'])
         self.report.actStage(True)
@@ -77,10 +78,21 @@ class DataMgr(object):
         parm = gv.gStageDict['testBed']
         self.testBed = Stage('testBed', parm['pos'], parm['link'], parm['bg'])
         
+        if 'testActionLayerModule' in gv.gStageDict.keys():
+            parm = gv.gStageDict['testActionLayerModule']
+            self.testModule = Stage('testActionLayerModule', parm['pos'], parm['link'], parm['bg'])
+            self.rtn_addiontal = True
+
+
     def getStagesList(self):
+        if self.rtn_addiontal:
+            return [self.report ,self.analysis, self.artifactDe, self.artifactRe,  
+                    self.aptEvnts, self.mitreTTPs, self.components,
+                    self.proDec, self.screenPlay, self.testBed,  self.testModule]
+
         return [self.report ,self.analysis, self.artifactDe, self.artifactRe,  
-                self.aptEvnts, self.mitreTTPs, self.components,
-                self.proDec, self.screenPlay, self.testBed ]
+                    self.aptEvnts, self.mitreTTPs, self.components,
+                    self.proDec, self.screenPlay, self.testBed]
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

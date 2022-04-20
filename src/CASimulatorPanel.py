@@ -157,6 +157,9 @@ class PanelImge(wx.Panel):
                 if i == 4:
                     if stage.name == 'report' and self.fileState == 2:
                         self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1], color=wx.Colour('Green'))
+                    elif stage.name == 'report' and self.fileState == 1:
+                        val = 30 + 10 * int (gv.idataMgr.report.stageProgress)
+                        self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+val, pt[1], color=wx.Colour('Yellow'))
                     else:
                         self.DrawArrowLine(dc, pt[0], pt[1], pt[0]+130, pt[1])
 
@@ -238,6 +241,7 @@ class PanelImge(wx.Panel):
                 stage.updateStage()
                 self.fileState = 1
                 self.pblist[stage.name].SetValue(stage.stageProgress)
+                self.updateDisplay()
             
             if gv.idataMgr.report.stageProgress == 10:
                 self.btlist['analysis'].Enable()
@@ -246,7 +250,7 @@ class PanelImge(wx.Panel):
 
             
 
-    def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=8, color= wx.Colour(0, 0, 0)):
+    def DrawArrowLine( self, dc, x0, y0, x1, y1, arrowFrom=True, arrowTo=True, arrowLength=16, arrowWidth=10, color= wx.Colour(0, 0, 0)):
         '''
             Draws a line with arrows in a regular wxPython DC.
             The line is drawn with the dc's wx.Pen.  The arrows are filled with the current Pen's colour.

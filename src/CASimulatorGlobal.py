@@ -78,6 +78,19 @@ gStageDict = {
         'pos': (750, 550), 'link': (0, ),
         'bg': os.path.join(dirpath, IMG_FD, 'testBed', "testBed_img_120.png")
     },  # Test bed automation 
+
+    # 'testActionLayerModule': {
+    #     'pos': (50, 550), 'link': (0, ),
+    #     'bg': os.path.join(dirpath, IMG_FD , "placeHoderImg.png")
+    # },  # Test add new action module in the action handling layer
+
+    'testActionLayerModule': {
+         'pos': (50, 550), 'link': (0, ),
+         'bg': os.path.join(dirpath, IMG_FD , "placeHoderImg.png")
+    },  # Test add new action module in the action handling layer
+
+
+
 }
 
 
